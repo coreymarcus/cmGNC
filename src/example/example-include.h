@@ -4,8 +4,10 @@
 namespace example {
 
 	class ExampleClass{
+	
 
 	public:
+		ExampleClass();
 		int pubvar_;
 		int PubFun(int input);
 
