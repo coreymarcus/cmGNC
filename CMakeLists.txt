@@ -7,7 +7,7 @@ set(CMAKE_BUILD_TYPE Release)#Debug
 #set(CMAKE_CXX_FLAGS "-g -O0 -std=c++17 ${CMAKE_CXX_FLAGS} -Wno-format-security -Wno-literal-suffix")
 
 #add the executable
-add_executable(cmGNC.run src/mainGNC.cc src/example/example-include.cc)#.cpp is preferred
+add_executable(cmGNC.run src/mainGNC.cc src/example/example-include.cc)
 
 # Set the include directories
 target_include_directories(cmGNC.run PUBLIC "${PROJECT_SOURCE_DIR}/src/example")
