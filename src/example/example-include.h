@@ -13,7 +13,7 @@ namespace example {
 
 	private:
 		int privvar_;
-		int PrivFun(int input);
+		int PrivFun();
 
 	}; //class ExampleClass
 

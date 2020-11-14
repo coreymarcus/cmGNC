@@ -6,11 +6,16 @@ namespace example{
 	ExampleClass::ExampleClass(){}
 
 	int ExampleClass::PubFun(int input){
-		return input;
+		
+		//set the private variable to the input
+		privvar_ = input;
+
+		//call the private function
+		return PrivFun();
 	}
 
-	int ExampleClass::PrivFun(int input){
-		return input;
+	int ExampleClass::PrivFun(){
+		return privvar_ + pubvar_;
 	}
 
 

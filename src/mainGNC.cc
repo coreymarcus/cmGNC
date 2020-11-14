@@ -12,6 +12,9 @@ int main() {
 	//form an instance of the example class
 	example::ExampleClass test;
 
+	//define the public variable
+	test.pubvar_ = 6;
+
 	//test our class
 	std::cout << test.PubFun(4) << std::endl;
 }
