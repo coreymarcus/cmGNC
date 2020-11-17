@@ -14,10 +14,17 @@ function F = Drag(v, rho, Cd, A)
 Fmag = 0.5*rho*(v'*v)*Cd*A;
 
 %calculate anti-parallel velocity vector
-vect = -v/norm(v);
+nv = norm(v);
+if(nv == 0)
+    F = [0 0]'; %guard against divide by zero
+else
+    
+    %anti-parallel vector
+    vect = -v/norm(v);
 
-%output
-F = Fmag*vect;
+    %output
+    F = Fmag*vect;
+end
 
 end
 

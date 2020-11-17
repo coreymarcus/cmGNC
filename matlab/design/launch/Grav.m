@@ -13,11 +13,19 @@ function g = Grav(r, mu, m2)
 % calculate magnitude of force
 F = mu*m2/(r'*r);
 
-% negative unit vector of position
-v = -r/norm(r);
+%norm of r
+nr = norm(r);
 
-%output
-g = v*F;
+% divide by zero protection
+if(nr == 0)
+    g = [0 0]';
+else
+    % negative unit vector of position
+    v = -r/nr;
+    
+    %output
+    g = v*F;
+end
 
 end
 
