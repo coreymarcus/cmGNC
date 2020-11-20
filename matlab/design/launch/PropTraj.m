@@ -4,7 +4,7 @@ function xhist = PropTraj(t, u, x0, physparams, vehicleparams)
 % 
 % INPUTS
 % t = [1xN] vector of times for evaluation
-% u = [2x(N-1)] vector of control inputs to be applied beginning at each time
+% u = [2x(N-1)] array of control inputs to be applied beginning at each time
 %   and constantly until the next time
 % x0 = [5x1] initial state
 % physparams - physics parameters
