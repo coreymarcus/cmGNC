@@ -33,15 +33,22 @@ a = theta2 - theta1;
 b = r2 - r1;
 
 %sample
-L = 500;
-theta_samp = linspace(theta1,theta2,L);
-r_samp = zeros(L,1);
-for ii = 1:L
+% theta_samp = linspace(theta1,theta2,L);
+theta_samp = logspace(log10(theta1),log10(theta2),N);
+r_samp = zeros(N,1);
+for ii = 1:N
     r_samp(ii) = r1 + b*sqrt(1 - (theta_samp(ii) - theta2)^2/a^2);
 end
 
+
+% figure
+% subplot(2,1,1)
+% plot(theta_samp,r_samp)
+% subplot(2,1,2)
+% plot(theta_samp,1:L)
+
 %find the final tangential velocity
-safefactor = 1.1;
+safefactor = 1;
 vcircle = safefactor*sqrt(physparams.earthgrav/r2);
 
 %convert to cartesian coordinates
@@ -49,9 +56,9 @@ x_targ = r_samp'.*cos(theta_samp);
 y_targ = r_samp'.*sin(theta_samp);
 
 %find the approximate arc length
-pathtrack = zeros(1,L);
+pathtrack = zeros(1,N);
 pathlen = 0;
-for ii = 1:(L-1)
+for ii = 1:(N-1)
     pathlen = pathlen + sqrt((x_targ(ii+1) - x_targ(ii))^2 + (y_targ(ii+1) - y_targ(ii))^2);
     pathtrack(ii+1) = pathlen;
 end
@@ -65,13 +72,13 @@ acceltang = vcircle/tfinal;
 timetrack = sqrt(2*pathtrack/acceltang);
 
 %we can now create velocity targets at each node
-x_vel_targ = zeros(1,L);
-y_vel_targ = zeros(1,L);
-for ii = 2:L
+x_vel_targ = zeros(1,N);
+y_vel_targ = zeros(1,N);
+for ii = 2:N
     %tangential velocity at this node
     v = acceltang*sqrt(2*pathtrack(ii)/acceltang);
     
-    if(ii < L)
+    if(ii < N)
         %tan behind and in front
         tanback = [(x_targ(ii) - x_targ(ii-1));
             (y_targ(ii) - y_targ(ii-1))];
@@ -96,12 +103,9 @@ for ii = 2:L
 end
 
 %finally, we must find the acceleration target for each step
-x_accel_targ = zeros(1,L);
-y_accel_targ = zeros(1,L);
-for ii = 1:(L-1)
-    
-    %find accel from gravity
-    g = Grav([x_targ(ii); y_targ(ii)], physparams.earthgrav, 1);
+x_accel_targ = zeros(1,N);
+y_accel_targ = zeros(1,N);
+for ii = 1:(N-1)
     
     %change in variables
     dt = timetrack(ii+1) - timetrack(ii);
@@ -109,8 +113,8 @@ for ii = 1:(L-1)
     dvely = y_vel_targ(ii+1) - y_vel_targ(ii);
     
     %calculate required acceleration to meet next velocity
-    x_accel_targ(ii) = (dvelx - g(1)*dt)/dt;
-    y_accel_targ(ii) = (dvely - g(2)*dt)/dt;
+    x_accel_targ(ii) = dvelx/dt;
+    y_accel_targ(ii) = dvely/dt;
 end
 
 % %parameters for drawing

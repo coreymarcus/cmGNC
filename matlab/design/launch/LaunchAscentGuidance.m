@@ -27,6 +27,9 @@ vehicleparams.effectivearea = 0.00001;
 %% Optimization Parameters
 numnodes = 1000; %number of discrete nodes for optimization
 
+%% Other Setup
+addpath('C:\Users\corey\Documents\GitHub\matlabScripts')
+
 %% Main
 
 % Test for gravity
@@ -60,33 +63,62 @@ numnodes = 1000; %number of discrete nodes for optimization
 % grid on
 
 % test initial trajectory generation
-N = 1000;
-r = physparams.earthradius_m + 2.5*physparams.atmoheight_m;
+N = 500;
+rtarg = physparams.earthradius_m + 2.5*physparams.atmoheight_m;
 x0 = [0 physparams.earthradius_m]';
-traj = GenerateInitialTrajectory(N, r, x0, physparams, vehicleparams);
+traj = GenerateInitialTrajectory(N, rtarg, x0, physparams, vehicleparams);
 
 %initial state
 initstate = [x0; 0; 0; vehicleparams.vehiclemass_kg];
 
+%find input
+u = TrajToInput(traj, physparams, vehicleparams);
+
 %see what orbit we end in
 addedtime = (traj.thist(end)+1):100:(traj.thist(end)+6000);
-addedaccel = zeros(2,length(addedtime));
+addedinput = zeros(2,length(addedtime));
 
-%input
-u = [traj.accel, addedaccel];
+%padded input
+uadded = [u, addedinput];
 
 %propagate our initial traj
-xhist = PropTraj([traj.thist addedtime], u, initstate, physparams, vehicleparams);
+xhist = PropTraj([traj.thist addedtime], uadded, initstate, physparams, vehicleparams);
+
+% %magnitude of thrust at each time step
+% umag = zeros(1,N);
+% for ii = 1:N
+%     umag(ii) = norm(u(:,ii));
+% end
+%     
 
 figure
 plot(xhist(1,:), xhist(2,:))
 hold on
-quiver(xhist(1,1:10:end), xhist(2,1:10:end), u(1,1:10:end), u(2,1:10:end))
+quiver(xhist(1,1:10:end), xhist(2,1:10:end), uadded(1,1:10:end), uadded(2,1:10:end))
 axis equal
 grid on
 
+%find the cost of this u
+uvector = reshape(u,2*(N-1),1);
+tic
+J = TrajCost_mex(uvector, traj.thist, initstate, physparams, vehicleparams, 0, rtarg);
+toc
+disp(J)
 
+%form a function
+funJ = @(u) TrajCost_mex(u, traj.thist, initstate, physparams, vehicleparams, 0, rtarg);
 
+%derivative function
+funJderiv = @(u) FD(u,funJ,1E-4);
+
+tic
+Jprime2 = funJderiv(uvector);
+toc
+
+%evaluate derivative
+% tic
+% Jprime = TrajCostDeriv_mex(uvector, traj.thist, initstate, physparams, vehicleparams, 0, rtarg);
+% toc
 
 
 
