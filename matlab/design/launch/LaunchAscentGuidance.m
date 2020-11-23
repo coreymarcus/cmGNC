@@ -29,6 +29,7 @@ numnodes = 1000; %number of discrete nodes for optimization
 
 %% Other Setup
 addpath('C:\Users\corey\Documents\GitHub\matlabScripts')
+addpath('C:\Users\corey\Documents\GitHub\OST\Project')
 
 %% Main
 
@@ -82,7 +83,7 @@ addedinput = zeros(2,length(addedtime));
 uadded = [u, addedinput];
 
 %propagate our initial traj
-xhist = PropTraj([traj.thist addedtime], uadded, initstate, physparams, vehicleparams);
+xhistInit = PropTraj([traj.thist addedtime], uadded, initstate, physparams, vehicleparams);
 
 % %magnitude of thrust at each time step
 % umag = zeros(1,N);
@@ -92,9 +93,9 @@ xhist = PropTraj([traj.thist addedtime], uadded, initstate, physparams, vehiclep
 %     
 
 figure
-plot(xhist(1,:), xhist(2,:))
+plot(xhistInit(1,:), xhistInit(2,:))
 hold on
-quiver(xhist(1,1:10:end), xhist(2,1:10:end), uadded(1,1:10:end), uadded(2,1:10:end))
+quiver(xhistInit(1,1:10:end), xhistInit(2,1:10:end), uadded(1,1:10:end), uadded(2,1:10:end))
 axis equal
 grid on
 
@@ -111,14 +112,40 @@ funJ = @(u) TrajCost_mex(u, traj.thist, initstate, physparams, vehicleparams, 0,
 %derivative function
 funJderiv = @(u) FD(u,funJ,1E-4);
 
-tic
-Jprime2 = funJderiv(uvector);
-toc
+% tic
+% Jprime2 = funJderiv(uvector);
+% toc
 
 %evaluate derivative
 % tic
 % Jprime = TrajCostDeriv_mex(uvector, traj.thist, initstate, physparams, vehicleparams, 0, rtarg);
 % toc
 
+%set optimizer options
+options.method = 'BFGS';
+options.LS_initStride = .1;
+options.LS_tol = 1E-3;
+options.optTol = 1E-3;
+options.maxIter = 100;
+options.dispFreq = 1;
+
+%Call optimizer
+% [xHist, bigHist, JacCount, HesCount] = genOptimizer(funJ,funJderiv,uvector,options);
+% 
+% uFinal = xHist{end}(:,end);
+% uFinal = reshape(uFinal,2,N-1);
+
+matoptoptions = optimoptions('lsqnonlin','Display','iter-detailed');
+uFinal = lsqnonlin(funJ, uvector,[],[], matoptoptions);
+uFinal = reshape(uFinal,2,N-1);
 
 
+%propagate final trajectory
+xhist = PropTraj([traj.thist addedtime], [uFinal, addedinput], initstate, physparams, vehicleparams);
+
+figure
+plot(xhist(1,:), xhist(2,:))
+hold on
+quiver(xhist(1,1:10:end), xhist(2,1:10:end), uadded(1,1:10:end), uadded(2,1:10:end))
+axis equal
+grid on
