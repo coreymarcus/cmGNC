@@ -20,7 +20,7 @@ function [traj] = GenerateInitialTrajectory(N, r, x0, physparams, vehicleparams)
 theta1 = atan2(x0(2),x0(1));
 
 % arbitrarily designate final angle
-theta2 = theta1 + pi/4;
+theta2 = theta1 + 0.30*pi;
 
 % starting point
 r1 = norm(x0);
