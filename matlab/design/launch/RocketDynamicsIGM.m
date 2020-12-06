@@ -1,4 +1,4 @@
-function dxdt = RocketDynamics(t,x,u,physparams,vehicleparams)
+function dxdt = RocketDynamicsIGM(t,x,physparams,vehicleparams, chi_tilde, K1, PhiT, K2, T2, t0)
 %RocketDynamics produces the change in state per unit of time of the rocket
 % 
 % INPUTS:
@@ -22,6 +22,19 @@ pos = x(1:2);
 vel = x(3:4);
 m = x(5);
 
+%caculate IGM pitch angle
+chi = chi_tilde - K1 - PhiT + K2*(t - t0);
+
+%vect along force
+u_hat = [cos(chi); sin(chi)];
+
+%force mag
+g0 = abs(Grav(physparams.earthradius_m,physparams.earthgrav,1.0));
+F = g0*vehicleparams.Isp*vehicleparams.m_dot;
+
+%force
+u = F*u_hat;
+
 % change in position
 dxdt(1:2) = vel;
 
@@ -41,7 +54,7 @@ Fgrav = Grav(pos, physparams.earthgrav, m);
 dxdt(3:4) = (Fdrag + Fgrav + u)/m;
 
 %change in mass
-dxdt(5) = vehicleparams.m_dot;
+dxdt(5) = -1*vehicleparams.m_dot;
 
 
 end

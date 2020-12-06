@@ -3,3 +3,4 @@ build/*
 *codegen*
 *.prj
 *.mexw64
+*.pdf
