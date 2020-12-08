@@ -65,8 +65,8 @@ eta1 = tempvec(2);
 
 %current velocity in injection coords
 tempvec = tempmat*[vx1; vy1];
-etadot1 = tempvec(1);
-xidot1 = tempvec(2); %Intetional reversal according to paper!
+xidot1 = tempvec(1);
+etadot1 = tempvec(2);
 
 %required change in velocity
 deltaxidot_star = xiT_dot - xidot1 - g_star*T2prime*sin(Phi_star);
@@ -106,6 +106,9 @@ C2 = eta1 - etaT + etadot1*T2 - 0.5*g_star*T2^2*cos(Phi_star) + sin(chi_tilde)*V
 K1 = B1*C2/(A2*B1 - A1*B2);
 K2 = A1*K1/B1;
 
+if(~isreal(K1))
+    disp("Imag K1!")
+end
 
 end
 
