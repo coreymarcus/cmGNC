@@ -114,14 +114,33 @@ while(T2 > dt)
 end
 
 %propagate for awhile to see how our orbit looks
+dt2 = 100; %propagate 10 seconds at a time
+Nafter = 75; %this many segments
+
+for ii = 1:Nafter
+    
+    %extract times
+    t0 = tvec(end);
+    tf = t0 + dt2;
+    tvec = [tvec tf];
+    
+    %extract state
+    xiter = xhist(:,end);
+    
+    %propagate
+    [~, x_hist_iter] = PropTrajSegment(xiter, t0, tf, [0;0], physparams, vehicleparams);
+    
+    %append
+    xhist = [xhist x_hist_iter(end,:)'];
+    
+end
 
 
 figure
-plot(xhist(1,:),xhist(2,:))
+plot(xhist(1,:),xhist(2,:),'LineWidth',2)
 hold on
-plot(x_earth,y_earth,x_atmo,y_atmo,x_targ,y_targ)
+plot(x_earth,y_earth,x_atmo,y_atmo,x_targ,y_targ,'x')
 legend('Trajectory','Earth','Atmosphere','Target Orbit')
-% axis([-3*physparams.earthradius_m 3*physparams.earthradius_m -3*physparams.earthradius_m 3*physparams.earthradius_m])
 
 figure
 plot(tvec, xhist(5,:))

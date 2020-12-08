@@ -60,7 +60,7 @@ tempmat = [cos(PhiT), -sin(PhiT);
 
 %current position in injection coords
 tempvec = tempmat*[x1; y1];
-xi1 = tempvec(1);
+% xi1 = tempvec(1); %apparently not needed
 eta1 = tempvec(2);
 
 %current velocity in injection coords

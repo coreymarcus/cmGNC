@@ -41,7 +41,9 @@ Fgrav = Grav(pos, physparams.earthgrav, m);
 dxdt(3:4) = (Fdrag + Fgrav + u)/m;
 
 %change in mass
-dxdt(5) = vehicleparams.m_dot;
+if(norm(u) > 0)
+    dxdt(5) = -vehicleparams.m_dot;
+end
 
 
 end
