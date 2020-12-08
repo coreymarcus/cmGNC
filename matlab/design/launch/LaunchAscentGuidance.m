@@ -4,8 +4,12 @@
 % documentation
 
 %The general plan is to find a minimum fuel ascent trajactory which targets
-%some specified circular orbit. This will all be done through direct
-%optimization methods.
+%some specified circular orbit. This will all be done in two parts,
+%following the example of the Saturn V guidance system. The atmospheric
+%portion of flight is controlled by a time tilt program where we ascend
+%maintaining terminal velocity. (I will show this is roughly optimal in the
+%documentation). The exo-atmospheric portion is controlled via Saturn's IGM
+%algorithm.
 
 clear
 close all
