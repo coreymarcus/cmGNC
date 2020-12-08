@@ -59,22 +59,14 @@ rtarg = physparams.earthradius_m + 2.5*physparams.atmoheight_m;
 x0 = [0 physparams.earthradius_m]';
 initstate = [x0; 0; 0; vehicleparams.vehiclemass_kg]; %initial vehicle state
 
-%get a best guess on the initial trajectory
-traj = GenerateInitialTrajectory(N_nodes, rtarg, x0, physparams, vehicleparams);
+%initial estimate for when we leave the atmosphere
+t_tilt_end = 240; %seconds
 
-%find input
-u_initial = TrajToInput(traj, physparams, vehicleparams);
+%initialize the polynomial
+timetiltpoly = GenInitPoly(t_tilt_end);
 
-%reshape initial input into decision variables
-dvar = reshape(u_initial,2*(N_nodes-1),1);
-
-%initialize optimization parameters
-lamb = zeros(N_consts,1);
-p = ones(N_consts,1);
-majorIter = 1;
-maxMajorIter = 100;
-majorConv = false;
-majorConvOnce = false;
+%convert poly to vector
+timetiltpoly_vect = PolyToVect(timetiltpoly);
 
 %form functions
 fun = @(u) TrajCost_mex(u, traj.thist, initstate, physparams, vehicleparams, 0, rtarg, lamb, p);

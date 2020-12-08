@@ -1,6 +1,9 @@
 function [P] = EnforceTimeTiltPolyConsts(P)
 %EnforceTimeTiltPolyConsts enforces polynomial continuity
 
+%initial angle
+P.f(1) = pi/2;
+
 %loop
 for ii = 2:4
     P.f(ii) = (P.a(ii-1) - P.a(ii))*((ii-1)*P.tf/4)^5 + ...

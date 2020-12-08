@@ -32,6 +32,12 @@ u_hat = [cos(chi); sin(chi)];
 g0 = abs(Grav(physparams.earthradius_m,physparams.earthgrav,1.0));
 F = g0*vehicleparams.Isp*vehicleparams.m_dot;
 
+%check for cutoff
+if(T2 < 1)
+    F = 0;
+    disp("MECO!")
+end
+
 %force
 u = F*u_hat;
 

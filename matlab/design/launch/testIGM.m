@@ -45,8 +45,8 @@ dt = vehicleparams.cycletime_sec;
 %initial state
 x0 = [0;
     physparams.earthradius_m + physparams.atmoheight_m;
-    500;
-    500;
+    0;
+    0;
     vehicleparams.vehiclemass_kg];
 
 %initialize output
@@ -115,7 +115,7 @@ end
 
 %propagate for awhile to see how our orbit looks
 dt2 = 100; %propagate 10 seconds at a time
-Nafter = 75; %this many segments
+Nafter = 0*75; %this many segments
 
 for ii = 1:Nafter
     

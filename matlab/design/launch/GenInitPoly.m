@@ -14,7 +14,7 @@ P.f = zeros(4,1);
 P.f(1) = pi/2;
 
 %total slope
-m = -P.f(1)/tf;
+m = -P.f(1)/(2*tf);
 
 %linear slope components of polys
 P.e = m*ones(4,1);
