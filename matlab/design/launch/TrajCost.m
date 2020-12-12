@@ -1,28 +1,22 @@
-function J = TrajCost(u, thist, initstate, physparams, vehicleparams, etarg, atarg, lamb, p)
-%TrajCost finds the cost of a given input u which must be minimized
+function J = TrajCost(u, thist, initstate, physparams, vehicleparams)
+%TrajCost finds the cost of a given input time-tilt poly which must be
+%minimized
 
-%find N
-N = length(u)/2;
+%convert the input to a poly
+timetiltpoly = VectToPoly1stDeg(u);
 
-%reshape the input
-uarray = reshape(u,2,N);
+%get initial mass
+m1 = initstate(5);
 
-%integrate the thrust
-Jthrust = 0;
-for ii = 1:N
-    umag = norm(uarray(:,ii));
-    dt = thist(ii+1) - thist(ii);
-    Jthrust = Jthrust + umag*dt;
-end
+%propagate trajectory
+xhist = PropTraj(thist, timetiltpoly, initstate, physparams, vehicleparams);
 
-%now, propagate
-xhist = PropTraj(thist, uarray, initstate, physparams, vehicleparams);
+%get final mass
+m2 = xhist(5,end);
 
-%evalutate constraints
-psi = constraintEval(xhist(:,end), atarg, etarg, uarray, vehicleparams.vehiclethrust_N, physparams.earthgrav);
+%cost is fuel consumption
+J = m1 - m2;
 
-%total cost
-J = Jthrust + lamb.'*psi + sum(p.*(psi.^2))/2;
 
 end
 

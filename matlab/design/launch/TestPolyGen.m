@@ -21,8 +21,8 @@ figure
 plot(t,poly_eval)
 
 %peturb polynomial
-P.a(3) = .002;
-P.b(1) = .09;
+P.a(3) = .1;
+P.b(1) = .5;
 P = EnforceTimeTiltPolyConsts(P);
 
 %evaluate peturbed

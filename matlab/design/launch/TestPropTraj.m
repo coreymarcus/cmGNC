@@ -12,10 +12,15 @@ physparams.earthgrav = 3.98600441*10^14; %gravity parameter for earth
 %% Vehicle Parameters
 vehicleparams.vehiclemass_kg = 8000;
 vehicleparams.coeffdrag = 0.75;
-vehicleparams.effectivearea = 0.00001;
+vehicleparams.effectivearea = pi*2^2;
 vehicleparams.Isp = 5000;
-vehicleparams.m_dot = 10;
-vehicleparams.cycletime_sec = .1;
+vehicleparams.g0 = 9.81;
+vehicleparams.m_dot_max = 10;
+vehicleparams.cycletime_sec = 1;
+vehicleparams.Kp = 1000; %atmo PID speed controller params
+vehicleparams.Ki = 500; %atmo PID speed controller params
+vehicleparams.Tmax = vehicleparams.Isp*vehicleparams.g0*vehicleparams.m_dot_max;
+vehicleparams.Tmin = 0.25*vehicleparams.Tmax;
 
 %IGM Inputs
 R0 = physparams.earthradius_m;
@@ -24,17 +29,17 @@ g0 = -1*Grav(R0,physparams.earthgrav,1.0);
 VT = sqrt(physparams.earthgrav/RT);
 m12 = vehicleparams.vehiclemass_kg;
 Vex2 = vehicleparams.Isp*g0;
-m2dot = vehicleparams.m_dot;
+m2dot = vehicleparams.m_dot_max;
 xiT_dot = VT;
 etaT_dot = 0;
 
 %time step
 dt = vehicleparams.cycletime_sec;
-t = 0:dt:300;
+t = [0:dt:1500, 1500+dt:100:8000];
 L = length(t);
 
 %generate time tilt polynomial
-t_exo = 70;
+t_exo = 310;
 timetiltpoly = GenInitPoly(t_exo);
 
 %initial state
@@ -47,12 +52,20 @@ x0 = [0;
 %propagate trajectory
 xhist = PropTraj(t, timetiltpoly, x0, physparams, vehicleparams);
 
-%calc alt
+%calc alt, speed, Vt
 alt = zeros(L,1);
+speed = zeros(L,1);
+Vt = zeros(L,1);
 for ii = 1:L
     alt(ii) = norm(xhist(1:2,ii)) - physparams.earthradius_m;
+    speed(ii) = norm(xhist(3:4,ii));
+    if(alt(ii) < physparams.atmoheight_m)
+        m = xhist(5,ii);
+        g = norm(Grav(xhist(1:2,ii),physparams.earthgrav,1));
+        rho = AirDensity(alt(ii),physparams.atmoheight_m);
+        Vt(ii) = sqrt((2*m*g)/(rho*vehicleparams.effectivearea*vehicleparams.coeffdrag));
+    end
 end
-
 
 %% Plotting
 
@@ -73,6 +86,16 @@ legend('Trajectory','Earth','Atmosphere','Target Orbit')
 
 figure
 plot(t, xhist(5,:))
+xlabel('time')
+ylabel('vehicle mass')
 
 figure
 plot(t, alt)
+xlabel('Time')
+ylabel('vehicle altitude')
+
+figure
+plot(t,speed,t,Vt)
+xlabel('time')
+ylabel('speed (m/s)')
+legend('Vehicle Speed','Terminal Velocity','location','best')

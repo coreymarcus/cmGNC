@@ -21,6 +21,7 @@ dxdt = zeros(5,1);
 pos = x(1:2);
 vel = x(3:4);
 m = x(5);
+e_int = x(6);
 
 %get tilt
 xi = EvalTimeTiltPoly(t,P);
@@ -43,23 +44,34 @@ xi_ecef = xi + Phi;
 %get speed
 spd = norm(vel);
 
-%get terminal speed
-Vt = sqrt((2*norm(Fgrav))/(rho*vehicleparams.effectivearea*vehicleparams.coeffdrag));
+% terminal speed PID with NaN protection
+if (rho > 0)
+    
+    % term vel
+    Vt = sqrt((2*norm(Fgrav))/(rho*vehicleparams.effectivearea*vehicleparams.coeffdrag));
+    
+    %PID thrust magnitude
+    e = Vt - spd;
+    u = vehicleparams.Kp*e + vehicleparams.Ki*e_int;
+    
+else
+    %if we have broken atmosphere, T = Tmax
+    u = vehicleparams.Tmax;
+    e = 0;
+end
+    
+%integrate controller error
+dxdt(6) = e;
 
-%thrust magnitude proportional to difference
-u = Vt - spd;
-
-%maximum thrust
-g0 = abs(Grav(physparams.earthradius_m,physparams.earthgrav,1.0));
-Tmax = g0*vehicleparams.Isp*vehicleparams.m_dot;
-if(u > Tmax)
-    u = Tmax;
-elseif(u < 0)
-    u = 0.5*Tmax;
+%saturate max/min thrust
+if(u > vehicleparams.Tmax)
+    u = vehicleparams.Tmax;
+elseif(u < vehicleparams.Tmin)
+    u = vehicleparams.Tmin;
 end
 
 %thrust
-T = Tmax*[cos(xi_ecef); sin(xi_ecef)];
+T = u*[cos(xi_ecef); sin(xi_ecef)];
 
 % change in position
 dxdt(1:2) = vel;
@@ -71,8 +83,8 @@ Fdrag = Drag(vel, rho, vehicleparams.coeffdrag, vehicleparams.effectivearea);
 dxdt(3:4) = (Fdrag + Fgrav + T)/m;
 
 %change in mass
-if(norm(u) > 0)
-    dxdt(5) = -vehicleparams.m_dot;
+if(u > 0)
+    dxdt(5) = -u/(vehicleparams.g0*vehicleparams.Isp);
 end
 
 

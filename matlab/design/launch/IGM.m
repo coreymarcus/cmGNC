@@ -19,7 +19,7 @@ V1 = sqrt(vx1^2 + vy1^2);
 R1 = sqrt(x1^2 + y1^2);
 
 %current angle
-Phi1 = atan(x1/y1);
+Phi1 = atan2(x1,y1);
 
 %current gravity
 g1 = g0*(R0/R1)^2;
@@ -89,7 +89,7 @@ deltaT2 = (b + sqrt(b^2 + a*c))/a;
 T2 = T2prime + deltaT2;
 
 %% Compute chi_tilde
-chi_tilde = atan((deltaetadot_star + g_star*deltaT2*cos(Phi_star))/(deltaxidot_star - g_star*deltaT2*sin(Phi_star)));
+chi_tilde = atan2((deltaetadot_star + g_star*deltaT2*cos(Phi_star)),(deltaxidot_star - g_star*deltaT2*sin(Phi_star)));
 
 %% Compute K1 and K2
 

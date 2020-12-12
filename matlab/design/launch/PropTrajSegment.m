@@ -1,6 +1,6 @@
-function [t_hist, x_hist] = PropTrajSegment(x0, t0, tf, P, physparams, vehicleparams)
-%PropTrajSegment propagates a rocket trajectory from t0 to tf given state
-%x0 assuming a constant control input along the trajectory
+function [t_hist, x_hist, new_err_int] = PropTrajSegment(x0, t0, tf, P, physparams, vehicleparams, err_int)
+%PropTrajSegment propagates a rocket trajectory from t0 to tf
+% used for atmospheric flight!
 % INPUTS
 %   x0 - initial rocket state
 %   t0 - initial time
@@ -14,7 +14,12 @@ function [t_hist, x_hist] = PropTrajSegment(x0, t0, tf, P, physparams, vehiclepa
 fun = @(t,x) RocketDynamics(t, x, P, physparams, vehicleparams);
 
 %call ode45
-[t_hist, x_hist] = ode45(fun, [t0 tf], x0);
+options = odeset('AbsTol',1E-6,'RelTol',1E-6);
+[t_hist, x_hist] = ode45(fun, [t0 tf], [x0; err_int], options);
+
+%trim output
+new_err_int = x_hist(end,6);
+x_hist = x_hist(:,1:5);
 
 end
 
