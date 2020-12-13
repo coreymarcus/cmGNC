@@ -11,12 +11,12 @@ physparams.earthmass_kg = 5.972*10^24;
 physparams.earthgrav = 3.98600441*10^14; %gravity parameter for earth
 
 %% Vehicle Parameters
-vehicleparams.vehiclemass_kg = 1000;
+vehicleparams.vehiclemass_kg = 10000;
 % vehicleparams.vehiclethrust_N = 15;
 vehicleparams.coeffdrag = 0.75;
 vehicleparams.effectivearea = 0.00001;
-vehicleparams.Isp = 400;
-vehicleparams.m_dot = 10;
+vehicleparams.Isp = 40000;
+vehicleparams.m_dot = 1;
 vehicleparams.cycletime_sec = 1;
 
 %IGM Inputs
@@ -46,7 +46,7 @@ tvec = 0;
 
 
 %loop managment
-maxIdx = 1000;
+maxIdx = 100;
 idx = 1;
 T2 = 3;
 
