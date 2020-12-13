@@ -30,14 +30,23 @@ m2dot = vehicleparams.m_dot;
 xiT_dot = VT;
 etaT_dot = 0;
 
+%vectors for plotting
+theta = linspace(0,2*pi,100);
+x_earth = R0*cos(theta);
+y_earth = R0*sin(theta);
+x_atmo = (R0+physparams.atmoheight_m)*cos(theta);
+y_atmo = (R0+physparams.atmoheight_m)*sin(theta);
+x_targ = RT*cos(theta);
+y_targ = RT*sin(theta);
+
 %time step
 dt = vehicleparams.cycletime_sec;
 
 %initial state
 x0 = [0;
-    physparams.earthradius_m + 1.5*physparams.atmoheight_m;
-    500;
-    500;
+    physparams.earthradius_m + physparams.atmoheight_m;
+    0;
+    0;
     vehicleparams.vehiclemass_kg];
 
 %initialize output
@@ -62,7 +71,7 @@ while(T2 > dt)
     [chi_tilde, K1, PhiT, K2, T2] = IGM(xhist(1:4,idx), g0, R0, RT, VT, m12, Vex2, m2dot, xiT_dot, etaT_dot);
     
     if(abs(imag(T2)) > 0)
-        disp("Imag!")
+        disp("Imag time remaining!")
         break
     end
     
@@ -73,8 +82,11 @@ while(T2 > dt)
     %assign
     xhist = [xhist xhistseg(end,:)'];
     
+    %update mass
+    m12 = xhist(5,end);
+    
     if(abs(imag(xhist(1,end))) > 0)
-        disp("Imag!")
+        disp("Imag position!")
         break
     end
     
@@ -89,6 +101,11 @@ while(T2 > dt)
         break;
     end
     
+    if(norm(xhist(1:2,end)) < R0)
+        disp("Crash!")
+        break;
+    end
+    
     disp(T2)
     
     %increment
@@ -96,9 +113,34 @@ while(T2 > dt)
     
 end
 
+%propagate for awhile to see how our orbit looks
+dt2 = 100; %propagate 10 seconds at a time
+Nafter = 0*75; %this many segments
+
+for ii = 1:Nafter
+    
+    %extract times
+    t0 = tvec(end);
+    tf = t0 + dt2;
+    tvec = [tvec tf];
+    
+    %extract state
+    xiter = xhist(:,end);
+    
+    %propagate
+    [~, x_hist_iter] = PropTrajSegment(xiter, t0, tf, [0;0], physparams, vehicleparams);
+    
+    %append
+    xhist = [xhist x_hist_iter(end,:)'];
+    
+end
+
+
 figure
-plot(xhist(1,:),xhist(2,:))
-axis([-3*physparams.earthradius_m 3*physparams.earthradius_m -3*physparams.earthradius_m 3*physparams.earthradius_m])
+plot(xhist(1,:),xhist(2,:),'LineWidth',2)
+hold on
+plot(x_earth,y_earth,x_atmo,y_atmo,x_targ,y_targ,'x')
+legend('Trajectory','Earth','Atmosphere','Target Orbit')
 
 figure
 plot(tvec, xhist(5,:))

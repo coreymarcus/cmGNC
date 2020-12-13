@@ -19,7 +19,7 @@ V1 = sqrt(vx1^2 + vy1^2);
 R1 = sqrt(x1^2 + y1^2);
 
 %current angle
-Phi1 = atan(x1/y1);
+Phi1 = atan2(x1,y1);
 
 %current gravity
 g1 = g0*(R0/R1)^2;
@@ -60,13 +60,13 @@ tempmat = [cos(PhiT), -sin(PhiT);
 
 %current position in injection coords
 tempvec = tempmat*[x1; y1];
-xi1 = tempvec(1);
+% xi1 = tempvec(1); %apparently not needed
 eta1 = tempvec(2);
 
 %current velocity in injection coords
 tempvec = tempmat*[vx1; vy1];
-etadot1 = tempvec(1);
-xidot1 = tempvec(2); %Intetional reversal according to paper!
+xidot1 = tempvec(1);
+etadot1 = tempvec(2);
 
 %required change in velocity
 deltaxidot_star = xiT_dot - xidot1 - g_star*T2prime*sin(Phi_star);
@@ -89,7 +89,7 @@ deltaT2 = (b + sqrt(b^2 + a*c))/a;
 T2 = T2prime + deltaT2;
 
 %% Compute chi_tilde
-chi_tilde = atan((deltaetadot_star + g_star*deltaT2*cos(Phi_star))/(deltaxidot_star - g_star*deltaT2*sin(Phi_star)));
+chi_tilde = atan2((deltaetadot_star + g_star*deltaT2*cos(Phi_star)),(deltaxidot_star - g_star*deltaT2*sin(Phi_star)));
 
 %% Compute K1 and K2
 
@@ -106,6 +106,9 @@ C2 = eta1 - etaT + etadot1*T2 - 0.5*g_star*T2^2*cos(Phi_star) + sin(chi_tilde)*V
 K1 = B1*C2/(A2*B1 - A1*B2);
 K2 = A1*K1/B1;
 
+if(~isreal(K1))
+    disp("Imag K1!")
+end
 
 end
 

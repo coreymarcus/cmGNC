@@ -1,4 +1,4 @@
-function [deriv] = TrajCostDeriv(uvector, thist, initstate, physparams, vehicleparams, atarg, rtarg);
+function [deriv] = TrajCostDeriv(uvector, thist, initstate, physparams, vehicleparams)
 %TrajCostDeriv finds derivative of cost
 
 %form a function

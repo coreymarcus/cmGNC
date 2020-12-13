@@ -4,3 +4,5 @@ build/*
 *.prj
 *.mexw64
 *.pdf
+matlab/design/launch/slprj/*
+*.slxc

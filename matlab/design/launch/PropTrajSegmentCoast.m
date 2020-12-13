@@ -1,4 +1,4 @@
-function [t_hist, x_hist] = PropTrajSegmentIGM(x0, t0, tf, physparams, vehicleparams, chi_tilde, K1, PhiT, K2, T2)
+function [t_hist, x_hist] = PropTrajSegmentCoast(x0, t0, tf, physparams, vehicleparams)
 %PropTrajSegment propagates a rocket trajectory from t0 to tf given state
 %x0 assuming a constant control input along the trajectory
 % INPUTS
@@ -11,10 +11,10 @@ function [t_hist, x_hist] = PropTrajSegmentIGM(x0, t0, tf, physparams, vehiclepa
 %   xf - final state
 
 % create function for ode45
-fun = @(t,x) RocketDynamicsIGM(t, x, physparams, vehicleparams,chi_tilde, K1, PhiT, K2, T2, t0);
+fun = @(t,x) RocketDynamicsCoast(t, x, physparams, vehicleparams);
 
 %call ode45
-options = odeset('AbsTol',1E-6,'RelTol',1E-6);
+options = odeset('AbsTol',1E-8,'RelTol',1E-8);
 [t_hist, x_hist] = ode45(fun, [t0 tf], x0, options);
 
 end

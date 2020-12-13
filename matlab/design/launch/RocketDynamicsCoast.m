@@ -1,4 +1,4 @@
-function dxdt = RocketDynamicsIGM(t,x,physparams,vehicleparams, chi_tilde, K1, PhiT, K2, T2, t0)
+function dxdt = RocketDynamicsCoast(t,x,physparams,vehicleparams)
 %RocketDynamics produces the change in state per unit of time of the rocket
 % 
 % INPUTS:
@@ -22,24 +22,6 @@ pos = x(1:2);
 vel = x(3:4);
 m = x(5);
 
-%caculate IGM pitch angle
-chi = chi_tilde - K1 - PhiT + K2*(t - t0);
-
-%vect along force
-u_hat = [cos(chi); sin(chi)];
-
-%force mag
-F = vehicleparams.Tmax;
-
-%check for cutoff
-if(T2 < vehicleparams.cycletime_sec)
-    F = 0;
-    disp("MECO!")
-end
-
-%force
-u = F*u_hat;
-
 % change in position
 dxdt(1:2) = vel;
 
@@ -56,12 +38,7 @@ Fdrag = Drag(vel, rho, vehicleparams.coeffdrag, vehicleparams.effectivearea);
 Fgrav = Grav(pos, physparams.earthgrav, m);
 
 % acceleration of vehicle
-dxdt(3:4) = (Fdrag + Fgrav + u)/m;
-
-%change in mass
-if(F > 0)
-    dxdt(5) = -F/(vehicleparams.g0*vehicleparams.Isp);
-end
+dxdt(3:4) = (Fdrag + Fgrav)/m;
 
 
 end
