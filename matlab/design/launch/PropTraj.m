@@ -35,6 +35,7 @@ err_int = 0;
 
 %loop
 MECOflag = false;
+dispflag = true;
 for ii = 1:(N-1)
     
     %times
@@ -58,6 +59,11 @@ for ii = 1:(N-1)
         %get params
         [chi_tilde, K1, PhiT, K2, T2] = IGM(xhist(1:4,ii),...
             g0, R0, RT, VT, m12, Vex2, m2dot, xiT_dot, etaT_dot);
+        
+        if(dispflag)
+            dispflag = false;
+            disp("Exiting Atmosphere...")
+        end
         
         if(T2 < vehicleparams.cycletime_sec) %defined as 10 for good performance in IGM
             disp("MECO!")

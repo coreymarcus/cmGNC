@@ -14,7 +14,7 @@ function [t_hist, x_hist] = PropTrajSegmentIGM(x0, t0, tf, physparams, vehiclepa
 fun = @(t,x) RocketDynamicsIGM(t, x, physparams, vehicleparams,chi_tilde, K1, PhiT, K2, T2, t0);
 
 %call ode45
-options = odeset('AbsTol',1E-6,'RelTol',1E-6);
+options = odeset('AbsTol',1E-10,'RelTol',1E-10);
 [t_hist, x_hist] = ode45(fun, [t0 tf], x0, options);
 
 end

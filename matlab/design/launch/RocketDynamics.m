@@ -1,6 +1,6 @@
 function dxdt = RocketDynamics(t,x,P,physparams,vehicleparams)
 %RocketDynamics produces the change in state per unit of time of the rocket
-% 
+%
 % INPUTS:
 % t - scalar time, currently unused but necessary later
 % x - state at time t, has the form of [position, velocity, mass]^T
@@ -23,17 +23,21 @@ vel = x(3:4);
 m = x(5);
 e_int = x(6);
 
+% find current altitude
+h = norm(pos) - physparams.earthradius_m;
+
 %get tilt
-xi = EvalTimeTiltPoly(t,P);
+if(vehicleparams.useheightpoly)
+    xi = EvalHeightTiltPoly(h,P);
+else
+    xi = EvalTimeTiltPoly(t,P);
+end
 
 %get current position angle
 Phi = atan2(pos(2),pos(1)) - pi/2;
 
 % force of gravity
 Fgrav = Grav(pos, physparams.earthgrav, m);
-
-% find current altitude
-h = norm(pos) - physparams.earthradius_m;
 
 % atmosphereic density
 rho = AirDensity(h, physparams.atmoheight_m);
@@ -59,7 +63,7 @@ else
     u = vehicleparams.Tmax;
     e = 0;
 end
-    
+
 %integrate controller error
 dxdt(6) = e;
 

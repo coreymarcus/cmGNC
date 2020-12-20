@@ -3,13 +3,17 @@ function J = TrajCost(u, thist, initstate, physparams, vehicleparams)
 %minimized
 
 %convert the input to a poly
-timetiltpoly = VectToPoly1stDeg(u);
+if(vehicleparams.useheightpoly)
+    poly = VectToHeightPoly(u, physparams.atmoheight_m, vehicleparams.PolySeg, vehicleparams.PolyDeg);
+else
+    poly = VectToPoly1stDeg(u);
+end
 
 %get initial mass
 m1 = initstate(5);
 
 %propagate trajectory
-xhist = PropTraj(thist, timetiltpoly, initstate, physparams, vehicleparams);
+xhist = PropTraj(thist, poly, initstate, physparams, vehicleparams);
 
 %get final mass
 m2 = xhist(5,end);

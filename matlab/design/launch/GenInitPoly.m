@@ -14,10 +14,10 @@ P.f = zeros(4,1);
 P.f(1) = pi/2;
 
 %final tilt
-tiltf = .75*pi/4;
+tiltf = .95*pi/2;
 
 %total slope
-m = (tiltf - P.f(1))/tf;
+m = (tiltf - P.f(1));
 
 %linear slope components of polys
 P.e = m*ones(4,1);

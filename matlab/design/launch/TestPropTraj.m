@@ -1,6 +1,6 @@
 clear
 close all
-clc
+% clc
 
 %% Physics Parameters
 physparams.earthradius_m = 6731000;
@@ -21,6 +21,7 @@ vehicleparams.Kp = 1000; %atmo PID speed controller params
 vehicleparams.Ki = 500; %atmo PID speed controller params
 vehicleparams.Tmax = vehicleparams.Isp*vehicleparams.g0*vehicleparams.m_dot_max;
 vehicleparams.Tmin = 0.25*vehicleparams.Tmax;
+vehicleparams.useheightpoly = true;
 
 %IGM Inputs
 R0 = physparams.earthradius_m;
@@ -41,6 +42,9 @@ L = length(t);
 %generate time tilt polynomial
 t_exo = 310;
 timetiltpoly = GenInitPoly(t_exo);
+Nsegment = 1; %number of segments for height tilt poly
+Ndegree = 2; %number of terms in height tilt poly. Const plus lin is 2 terms
+heighttiltpoly = GenInitHeightTiltPoly(physparams.atmoheight_m,Nsegment,Ndegree); 
 
 %initial state
 x0 = [0;
@@ -50,7 +54,7 @@ x0 = [0;
     vehicleparams.vehiclemass_kg];
 
 %propagate trajectory
-xhist = PropTraj(t, timetiltpoly, x0, physparams, vehicleparams);
+xhist = PropTraj(t, heighttiltpoly, x0, physparams, vehicleparams);
 
 %calc alt, speed, Vt
 alt = zeros(L,1);
@@ -99,3 +103,6 @@ plot(t,speed,t,Vt)
 xlabel('time')
 ylabel('speed (m/s)')
 legend('Vehicle Speed','Terminal Velocity','location','best')
+
+disp('Final Mass:')
+disp(xhist(5,end))

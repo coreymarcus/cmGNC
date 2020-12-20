@@ -34,6 +34,9 @@ vehicleparams.Kp = 1000; %atmo PID speed controller params
 vehicleparams.Ki = 500; %atmo PID speed controller params
 vehicleparams.Tmax = vehicleparams.Isp*vehicleparams.g0*vehicleparams.m_dot_max;
 vehicleparams.Tmin = 0.25*vehicleparams.Tmax;
+vehicleparams.PolySeg = 1;
+vehicleparams.PolyDeg = 2;
+vehicleparams.useheightpoly = true;
 
 %% IGM Inputs
 R0 = physparams.earthradius_m;
@@ -52,16 +55,11 @@ t = 0:dt:750;
 L = length(t);
 
 %% Optimization Parameters
-N_nodes = 500; %number of discrete nodes for optimization
-N_consts = 2 + N_nodes-1; %two final orbit constraints, N_nodes constraints for maximum thrust
-max_major_iter = 100;
-max_minor_iter = 1000;
-epsMajor = 1E-5;
 
-useMatlabSolver = true; %mine or matlabs
 matoptions = optimoptions('lsqnonlin','Algorithm','levenberg-marquardt',...
-    'Display','iter-detailed','FiniteDifferenceStepSize',1E-10,...
-    'MaxIterations',100,'FiniteDifferenceType','central');
+    'Display','iter-detailed','FiniteDifferenceStepSize',1E-3,...
+    'MaxIterations',100,'FiniteDifferenceType','central',...
+    'FunctionTolerance',1E-8);
 
 
 %% Main
@@ -74,14 +72,32 @@ x0 = [0;
     vehicleparams.vehiclemass_kg];
 
 %initial estimate for polynomial
-t_tilt_end = 310; %seconds
-timetiltpoly = GenInitPoly(t_tilt_end);
-dvar_init = PolyToVect1stDeg(timetiltpoly);
+if(vehicleparams.useheightpoly)
+    poly = GenInitHeightTiltPoly(physparams.atmoheight_m, ...
+        vehicleparams.PolySeg, vehicleparams.PolyDeg);
+    %poly.coeffs(2,1) = -0.0808;
+    dvar_init = HeightPolyToVect(poly);
+else
+    t_tilt_end = 310; %seconds
+    poly = GenInitPoly(t_tilt_end);
+    dvar_init = PolyToVect1stDeg(poly);
+end
 
 %form function
 fun = @(u) TrajCost(u, t, x0, physparams, vehicleparams);
-funJac = @(u) FD(u,fun,1E-10);
+% funJac = @(u) FD(u,fun,1E-3);
 % jac = funJac(dvar_init);
+
+Nsweep = 25;
+dvar_sweep = linspace(1.01*dvar_init,1.02*dvar_init,Nsweep);
+cost_sweep = zeros(Nsweep,1);
+for ii = 1:Nsweep
+    cost_sweep(ii) = fun(dvar_sweep(ii));
+    disp(ii)
+end
+
+figure
+plot(dvar_sweep,cost_sweep)
 
 %call matlab solver
 dvar_f = lsqnonlin(fun, dvar_init, [], [], matoptions);
