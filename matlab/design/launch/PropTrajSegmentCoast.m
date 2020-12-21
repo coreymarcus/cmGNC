@@ -14,7 +14,7 @@ function [t_hist, x_hist] = PropTrajSegmentCoast(x0, t0, tf, physparams, vehicle
 fun = @(t,x) RocketDynamicsCoast(t, x, physparams, vehicleparams);
 
 %call ode45
-options = odeset('AbsTol',1E-8,'RelTol',1E-8);
+options = odeset('AbsTol',1E-12,'RelTol',1E-12);
 [t_hist, x_hist] = ode45(fun, [t0 tf], x0, options);
 
 end

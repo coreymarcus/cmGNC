@@ -36,6 +36,7 @@ err_int = 0;
 %loop
 MECOflag = false;
 dispflag = true;
+althist = zeros(N,1);
 for ii = 1:(N-1)
     
     %times
@@ -44,7 +45,9 @@ for ii = 1:(N-1)
     
     %get altitude, check if we have left the atmo
     alt = norm(xhist(1:2,ii)) - physparams.earthradius_m;
-    
+    althist(ii) = alt;
+    plot(t,althist)
+    pause(0.01)
     if(alt < 0)
         disp("Crash!")
         break
@@ -56,6 +59,9 @@ for ii = 1:(N-1)
         
     elseif(~MECOflag) %use IGM
         
+        %update mass
+        m12 = xhist(5,ii);
+        
         %get params
         [chi_tilde, K1, PhiT, K2, T2] = IGM(xhist(1:4,ii),...
             g0, R0, RT, VT, m12, Vex2, m2dot, xiT_dot, etaT_dot);
@@ -65,7 +71,7 @@ for ii = 1:(N-1)
             disp("Exiting Atmosphere...")
         end
         
-        if(T2 < vehicleparams.cycletime_sec) %defined as 10 for good performance in IGM
+        if(T2 < vehicleparams.cycletime_sec || MECOflag) %defined as 10 for good performance in IGM
             disp("MECO!")
             MECOflag = true;
             
