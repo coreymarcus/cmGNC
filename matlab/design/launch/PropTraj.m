@@ -47,11 +47,14 @@ for ii = 1:(N-1)
     alt = norm(xhist(1:2,ii)) - physparams.earthradius_m;
     althist(ii) = alt;
     plot(t,althist)
-    pause(0.01)
+    drawnow
     if(alt < 0)
         disp("Crash!")
         break
-    elseif((alt >= 0) && (alt < physparams.atmoheight_m))
+    elseif(xhist(5,ii) < 0)
+        disp("Negative Mass!")
+        break
+    elseif((alt >= 0) && (alt < physparams.atmoheight_m) && ~MECOflag)
         
         %call segment propagator
         [~, xhistseg, err_int] = PropTrajSegment(xhist(:,ii),...

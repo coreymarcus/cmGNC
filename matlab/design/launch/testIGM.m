@@ -16,8 +16,10 @@ vehicleparams.vehiclemass_kg = 10000;
 vehicleparams.coeffdrag = 0.75;
 vehicleparams.effectivearea = 0.00001;
 vehicleparams.Isp = 40000;
-vehicleparams.m_dot = 1;
+vehicleparams.m_dot_max = 25;
 vehicleparams.cycletime_sec = 1;
+vehicleparams.g0 = 9.81;
+vehicleparams.Tmax = vehicleparams.Isp*vehicleparams.g0*vehicleparams.m_dot_max;
 
 %IGM Inputs
 R0 = physparams.earthradius_m;
@@ -26,7 +28,7 @@ g0 = -1*Grav(R0,physparams.earthgrav,1.0);
 VT = sqrt(physparams.earthgrav/RT);
 m12 = vehicleparams.vehiclemass_kg;
 Vex2 = vehicleparams.Isp*g0;
-m2dot = vehicleparams.m_dot;
+m2dot = vehicleparams.m_dot_max;
 xiT_dot = VT;
 etaT_dot = 0;
 
@@ -44,9 +46,9 @@ dt = vehicleparams.cycletime_sec;
 
 %initial state
 x0 = [0;
-    physparams.earthradius_m + physparams.atmoheight_m;
-    0;
-    0;
+    physparams.earthradius_m + 1.1*physparams.atmoheight_m;
+    500;
+    500;
     vehicleparams.vehiclemass_kg];
 
 %initialize output
@@ -55,7 +57,7 @@ tvec = 0;
 
 
 %loop managment
-maxIdx = 100;
+maxIdx = 1000;
 idx = 1;
 T2 = 3;
 

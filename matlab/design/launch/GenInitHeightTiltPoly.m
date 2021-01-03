@@ -12,7 +12,7 @@ P.coeffs = zeros(deg,N);
 P.coeffs(1,1) = pi/2;
 
 %final tilt
-tiltf = .95*pi/2;
+tiltf = 0*pi/2;
 
 %total slope
 m = (tiltf - P.coeffs(1,1));

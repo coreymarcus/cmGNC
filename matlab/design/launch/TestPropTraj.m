@@ -1,6 +1,6 @@
 clear
 close all
-% clc
+clc
 
 %% Physics Parameters
 physparams.earthradius_m = 6731000;
@@ -10,13 +10,13 @@ physparams.earthmass_kg = 5.972*10^24;
 physparams.earthgrav = 3.98600441*10^14; %gravity parameter for earth
 
 %% Vehicle Parameters
-vehicleparams.vehiclemass_kg = 8000;
-vehicleparams.coeffdrag = 0.75;
+vehicleparams.vehiclemass_kg = 120000;
+vehicleparams.coeffdrag = 1.75;
 vehicleparams.effectivearea = pi*2^2;
-vehicleparams.Isp = 5000;
+vehicleparams.Isp = 600;
 vehicleparams.g0 = 9.81;
-vehicleparams.m_dot_max = 10;
-vehicleparams.cycletime_sec = 0.1;
+vehicleparams.m_dot_max = 720;
+vehicleparams.cycletime_sec = .25;
 vehicleparams.Kp = 1000; %atmo PID speed controller params
 vehicleparams.Ki = 500; %atmo PID speed controller params
 vehicleparams.Tmax = vehicleparams.Isp*vehicleparams.g0*vehicleparams.m_dot_max;
