@@ -11,15 +11,18 @@ physparams.earthmass_kg = 5.972*10^24;
 physparams.earthgrav = 3.98600441*10^14; %gravity parameter for earth
 
 %% Vehicle Parameters
-vehicleparams.vehiclemass_kg = 10000;
-% vehicleparams.vehiclethrust_N = 15;
-vehicleparams.coeffdrag = 0.75;
-vehicleparams.effectivearea = 0.00001;
-vehicleparams.Isp = 40000;
-vehicleparams.m_dot_max = 25;
-vehicleparams.cycletime_sec = 1;
+vehicleparams.vehiclemass_kg = 120000;
+vehicleparams.coeffdrag = 1.75;
+vehicleparams.effectivearea = pi*2^2;
+vehicleparams.Isp = 600;
 vehicleparams.g0 = 9.81;
+vehicleparams.m_dot_max = 720;
+vehicleparams.cycletime_sec = .25;
+vehicleparams.Kp = 1000; %atmo PID speed controller params
+vehicleparams.Ki = 500; %atmo PID speed controller params
 vehicleparams.Tmax = vehicleparams.Isp*vehicleparams.g0*vehicleparams.m_dot_max;
+vehicleparams.Tmin = 0.25*vehicleparams.Tmax;
+vehicleparams.useheightpoly = true;
 
 %IGM Inputs
 R0 = physparams.earthradius_m;
@@ -45,11 +48,16 @@ y_targ = RT*sin(theta);
 dt = vehicleparams.cycletime_sec;
 
 %initial state
-x0 = [0;
-    physparams.earthradius_m + 1.1*physparams.atmoheight_m;
-    500;
-    500;
-    vehicleparams.vehiclemass_kg];
+% x0 = [0;
+%     physparams.earthradius_m + 1.1*physparams.atmoheight_m;
+%     500;
+%     500;
+%     vehicleparams.vehiclemass_kg];
+x0 =    1.0e+06 * [0.081480412756757
+   6.830526991117575
+   0.001933832586866
+   0.001073954750190
+   0.042360203217368];
 
 %initialize output
 xhist = x0;
@@ -117,7 +125,7 @@ end
 
 %propagate for awhile to see how our orbit looks
 dt2 = 100; %propagate 10 seconds at a time
-Nafter = 0*75; %this many segments
+Nafter = 75; %this many segments
 
 for ii = 1:Nafter
     
@@ -130,7 +138,7 @@ for ii = 1:Nafter
     xiter = xhist(:,end);
     
     %propagate
-    [~, x_hist_iter] = PropTrajSegment(xiter, t0, tf, [0;0], physparams, vehicleparams);
+    [~, x_hist_iter] = PropTrajSegmentCoast(xiter, t0, tf, physparams, vehicleparams);
     
     %append
     xhist = [xhist x_hist_iter(end,:)'];

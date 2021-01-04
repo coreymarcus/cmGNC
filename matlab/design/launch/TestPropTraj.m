@@ -10,13 +10,13 @@ physparams.earthmass_kg = 5.972*10^24;
 physparams.earthgrav = 3.98600441*10^14; %gravity parameter for earth
 
 %% Vehicle Parameters
-vehicleparams.vehiclemass_kg = 120000;
+vehicleparams.vehiclemass_kg = 360000;
 vehicleparams.coeffdrag = 1.75;
-vehicleparams.effectivearea = pi*2^2;
+vehicleparams.effectivearea = 2*pi*2^2;
 vehicleparams.Isp = 600;
 vehicleparams.g0 = 9.81;
-vehicleparams.m_dot_max = 720;
-vehicleparams.cycletime_sec = .25;
+vehicleparams.m_dot_max = 800;
+vehicleparams.cycletime_sec = 1;
 vehicleparams.Kp = 1000; %atmo PID speed controller params
 vehicleparams.Ki = 500; %atmo PID speed controller params
 vehicleparams.Tmax = vehicleparams.Isp*vehicleparams.g0*vehicleparams.m_dot_max;
@@ -103,6 +103,11 @@ plot(t,speed,t,Vt)
 xlabel('time')
 ylabel('speed (m/s)')
 legend('Vehicle Speed','Terminal Velocity','location','best')
+
+figure
+plot(t, vehicleparams.Tmax./(xhist(5,:)*g0))
+xlabel('time')
+ylabel('TWR')
 
 disp('Final Mass:')
 disp(xhist(5,end))

@@ -48,7 +48,7 @@ for ii = 1:(N-1)
     althist(ii) = alt;
     plot(t,althist)
     drawnow
-    if(alt < 0)
+    if(alt < -100)
         disp("Crash!")
         break
     elseif(xhist(5,ii) < 0)
@@ -72,9 +72,10 @@ for ii = 1:(N-1)
         if(dispflag)
             dispflag = false;
             disp("Exiting Atmosphere...")
+            disp(xhist(:,ii))
         end
         
-        if(T2 < vehicleparams.cycletime_sec || MECOflag) %defined as 10 for good performance in IGM
+        if(T2 < vehicleparams.cycletime_sec || MECOflag)
             disp("MECO!")
             MECOflag = true;
             
